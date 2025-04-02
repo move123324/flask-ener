@@ -1,14 +1,15 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <section id="airport-section">
   <div class="section-box">
     <div class="content-wrap">
       <h2>List of Airports</h2>
-
+      
+      <!-- Airport selection form -->
       <form method="POST" action="/liste">
         <label for="airport">Select your airport:</label>
         <select name="airport_id" id="airport">
+          <!-- Provide an empty option first -->
           <option value="">-- Choose an airport --</option>
           {% for airport in aeroport_list %}
             <option 
@@ -19,78 +20,93 @@
             </option>
           {% endfor %}
         </select>
-        <button type="submit">Search</button>
+
+        <!-- Two buttons: Search & Reset -->
+        <button type="submit" name="search">Search</button>
+        <button type="submit" name="reset">Reset</button>
       </form>
-
+      
+      <!-- Only show tables if user selected an airport -->
       {% if selected_airport_id %}
-        <div style="margin-top: 40px;">
-          <h3>Number of flights by aircraft type</h3>
-          {% if flight_details and flight_details|length > 0 %}
-            <table class="table-fixed-rows">
-              <thead>
-                <tr>
-                  <th>Aircraft type</th>
-                  <th>Number of flights</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for flight in flight_details %}
+        <div class="tables-container">
+          
+          <!-- Table: Number of flights by aircraft type -->
+          <div style="margin-top: 40px;">
+            <h3>Number of flights by aircraft type</h3>
+            {% if flight_details and flight_details|length > 0 %}
+              <table class="table-fixed-rows">
+                <thead>
                   <tr>
-                    <td>{{ flight['aircraft_type'] }}</td>
-                    <td>{{ flight['total_vols'] }}</td>
+                    <th>Aircraft type</th>
+                    <th>Number of flights</th>
                   </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <p>No flights found for this type of aircraft.</p>
-          {% endif %}
-        </div>
+                </thead>
+                <tbody>
+                  {% for flight in flight_details %}
+                    <tr>
+                      <td>{{ flight['aircraft_type'] }}</td>
+                      <td>{{ flight['total_vols'] }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No flights found for this type of aircraft.</p>
+            {% endif %}
+          </div>
+          
+          <!-- Table: Number of flights per day of the week -->
+          <div style="margin-top: 40px;">
+            <h3>Number of flights per day of the week</h3>
+            {% if flight_by_day and flight_by_day|length > 0 %}
+              <table class="table-fixed-rows">
+                <thead>
+                  <tr>
+                    <th>Day of the week</th>
+                    <th>Number of flights</th>
+                  </tr>
+                </thead>
+                <tbody>
+                  {% for flight in flight_by_day %}
+                    <tr>
+                      <td>{{ flight['day_of_week'] }}</td>
+                      <td>{{ flight['total_vols'] }}</td>
+                    </tr>
+                  {% endfor %}
+                </tbody>
+              </table>
+            {% else %}
+              <p>No flights found for this airport.</p>
+            {% endif %}
+          </div>
 
-        <div style="margin-top: 40px;">
-          <h3>Number of flights per day of the week</h3>
-          {% if flight_by_day and flight_by_day|length > 0 %}
-            <table class="table-fixed-rows">
-              <thead>
-                <tr>
-                  <th>Day of the week</th>
-                  <th>Number of flights</th>
-                </tr>
-              </thead>
-              <tbody>
-                {% for flight in flight_by_day %}
-                  <tr>
-                    <td>{{ flight['day_of_week'] }}</td>
-                    <td>{{ flight['total_vols'] }}</td>
-                  </tr>
-                {% endfor %}
-              </tbody>
-            </table>
-          {% else %}
-            <p>No flights found for this airport.</p>
-          {% endif %}
-        </div>
+        </div> <!-- .tables-container -->
       {% endif %}
-    </div>
-  </div>
+    </div> <!-- .content-wrap -->
+  </div> <!-- .section-box -->
 </section>
 
 <style>
+  /* 
+    100% responsive layout
+    We'll allow normal page scrolling 
+    so no content is clipped on smaller screens.
+  */
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    overflow: hidden;
+    width: 100%;
+    min-height: 100vh;
+    font-family: sans-serif;
+    /* We allow vertical scrolling so all content is accessible. */
+    overflow-x: hidden; /* no horizontal scroll bar if content is wide. */
   }
 
   #airport-section {
     width: 100%;
-    height: 100%;
     box-sizing: border-box;
-
-    display: flex;
-    align-items: center; 
-    justify-content: center;
+    /* Flexible top/bottom spacing (for large or small screens) */
+    padding: 2rem 1rem;
   }
 
   .section-box {
@@ -98,17 +114,15 @@
     padding: 30px;
     border-radius: 15px;
     max-width: 900px;
-    width: 95%;
+    margin: 0 auto; /* center horizontally */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     text-align-last: center;
-    
-    max-height: 90%;
-    overflow: auto;
+    width: 100%;
   }
 
   .content-wrap {
-    padding: 20px 50px;
+    padding: 20px;
   }
 
   select, input[type="text"] {
@@ -124,7 +138,7 @@
 
   button {
     margin-top: 10px;
-    padding: 8px 16px;
+    padding: 10px 16px;
     background-color: #00aaff;
     color: white;
     border: none;
@@ -134,6 +148,10 @@
 
   button:hover {
     background-color: #0088cc;
+  }
+
+  .tables-container {
+    margin-top: 1.5rem;
   }
 
   .table-fixed-rows {
@@ -150,7 +168,7 @@
     table-layout: fixed;
     position: sticky;
     top: 0;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.1);
     z-index: 5;
   }
 
@@ -163,7 +181,7 @@
 
   .table-fixed-rows tbody {
     display: block;
-    max-height: 8em; /* ~4 rows */
+    max-height: 8em; /* ~4 rows before scroll */
     overflow-y: auto;
     scroll-behavior: smooth;
     width: 100%;
@@ -173,6 +191,36 @@
     display: table;
     width: 100%;
     table-layout: fixed;
+  }
+
+  /* 
+    Media queries for smaller screens:
+    Reduce padding & font sizes so it fits better
+  */
+  @media (max-width: 768px) {
+    .section-box {
+      padding: 20px;
+    }
+    .content-wrap {
+      padding: 10px;
+    }
+    button {
+      width: 48%;
+      margin: 10px 1%;
+    }
+    select {
+      font-size: 0.9rem;
+    }
+  }
+
+  @media (max-width: 480px) {
+    h2, h3 {
+      font-size: 1.2rem;
+    }
+    button {
+      width: 100%;
+      margin: 10px 0;
+    }
   }
 </style>
 
