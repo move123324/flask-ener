@@ -6,14 +6,9 @@
     <div class="content-wrap">
       <h2>List of Airports</h2>
 
-      <!-- 
-        NOTE: Add an empty placeholder so user sees 
-        'Choose an airport' by default 
-      -->
       <form method="POST" action="/liste">
         <label for="airport">Select your airport:</label>
         <select name="airport_id" id="airport">
-          <!-- Show an empty option first -->
           <option value="">-- Choose an airport --</option>
           {% for airport in aeroport_list %}
             <option 
@@ -27,7 +22,6 @@
         <button type="submit">Search</button>
       </form>
 
-      <!-- Only show tables if user selected an airport -->
       {% if selected_airport_id %}
         <div style="margin-top: 40px;">
           <h3>Number of flights by aircraft type</h3>
@@ -82,15 +76,11 @@
 </section>
 
 <style>
-  /* 
-     NOTE: We remove page scrolling 
-     and center .section-box horizontally AND vertically
-  */
   html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden; /* no scroll for entire page */
+    overflow: hidden;
   }
 
   #airport-section {
@@ -98,13 +88,9 @@
     height: 100%;
     box-sizing: border-box;
 
-    /* 
-      Center the .section-box 
-      by using flex with align-items & justify-content 
-    */
     display: flex;
-    align-items: center;   /* vertical center */
-    justify-content: center; /* horizontal center */
+    align-items: center; 
+    justify-content: center;
   }
 
   .section-box {
@@ -117,11 +103,6 @@
     text-align: center;
     text-align-last: center;
     
-    /* 
-      If content is bigger than the box, 
-      let it scroll inside the box 
-      (like a "modal" or a "centered container").
-    */
     max-height: 90%;
     overflow: auto;
   }
