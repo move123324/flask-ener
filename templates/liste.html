@@ -2,18 +2,30 @@
 
 {% block content %}
 <section id="airport-section">
+  <!-- 
+     This container is flex-centered both horizontally & vertically, 
+     so the .section-box is in the middle of the screen. 
+  -->
   <div class="section-box">
     <div class="content-wrap">
       <h2>List of Airports</h2>
-
+      
       <!-- 
-        NOTE: Add an empty placeholder so user sees 
-        'Choose an airport' by default 
+        A minimal "loading spinner" 
+        We'll show/hide it via JavaScript if you like, 
+        or you can keep it always hidden except on form submission.
       -->
-      <form method="POST" action="/liste">
+      <div id="loadingSpinner" class="spinner" style="display: none;">
+        <div class="spinner-dot"></div>
+        <div class="spinner-dot"></div>
+        <div class="spinner-dot"></div>
+      </div>
+
+      <!-- Main form -->
+      <form method="POST" action="/liste" onsubmit="showSpinner()">
         <label for="airport">Select your airport:</label>
+        <!-- Empty option so user sees a placeholder -->
         <select name="airport_id" id="airport">
-          <!-- Show an empty option first -->
           <option value="">-- Choose an airport --</option>
           {% for airport in aeroport_list %}
             <option 
@@ -24,7 +36,17 @@
             </option>
           {% endfor %}
         </select>
-        <button type="submit">Search</button>
+        <div style="margin-top: 10px;">
+          <button type="submit">Search</button>
+          <!-- 
+            "Reset" button sets hidden input "reset" to "true", 
+            so we can detect it in the route. 
+          -->
+          <button type="submit" onclick="document.getElementById('resetInput').value='true';">
+            Reset
+          </button>
+          <input type="hidden" name="reset" id="resetInput" value="false" />
+        </div>
       </form>
 
       <!-- Only show tables if user selected an airport -->
@@ -72,6 +94,48 @@
                 {% endfor %}
               </tbody>
             </table>
+            
+            <!-- 
+              NOTE: Chart.js 
+              We'll show a bar chart for flight_by_day data 
+            -->
+            <canvas id="flightByDayChart" style="margin-top:20px;"></canvas>
+
+            <!-- Script to build the bar chart -->
+            <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+            <script>
+              // Build arrays from the day_of_week data
+              const flightByDayLabels = [
+                {% for row in flight_by_day %}
+                  "{{ row['day_of_week'] }}",
+                {% endfor %}
+              ];
+              const flightByDayValues = [
+                {% for row in flight_by_day %}
+                  {{ row['total_vols'] }},
+                {% endfor %}
+              ];
+
+              const ctx = document.getElementById('flightByDayChart');
+              const flightChart = new Chart(ctx, {
+                type: 'bar',
+                data: {
+                  labels: flightByDayLabels,
+                  datasets: [{
+                    label: 'Number of Flights',
+                    data: flightByDayValues,
+                    // backgroundColor: Optional color array or single color
+                  }]
+                },
+                options: {
+                  scales: {
+                    y: {
+                      beginAtZero: true
+                    }
+                  }
+                }
+              });
+            </script>
           {% else %}
             <p>No flights found for this airport.</p>
           {% endif %}
@@ -83,25 +147,19 @@
 
 <style>
   /* 
-     NOTE: We remove page scrolling 
-     and center .section-box horizontally AND vertically
+     1) Remove page scroll, center container with flex. 
   */
   html, body {
     margin: 0;
     padding: 0;
     height: 100%;
-    overflow: hidden; /* no scroll for entire page */
+    overflow: hidden;
   }
 
   #airport-section {
     width: 100%;
     height: 100%;
     box-sizing: border-box;
-
-    /* 
-      Center the .section-box 
-      by using flex with align-items & justify-content 
-    */
     display: flex;
     align-items: center;   /* vertical center */
     justify-content: center; /* horizontal center */
@@ -117,11 +175,8 @@
     text-align: center;
     text-align-last: center;
     
-    /* 
-      If content is bigger than the box, 
-      let it scroll inside the box 
-      (like a "modal" or a "centered container").
-    */
+    /* If content is bigger than the box, 
+       let it scroll inside (like a modal). */
     max-height: 90%;
     overflow: auto;
   }
@@ -155,21 +210,27 @@
     background-color: #0088cc;
   }
 
+  /*
+     2) Table with pinned header & a scrollable body 
+        that shows about ~4 rows (using 35vh or so).
+  */
   .table-fixed-rows {
     width: 100%;
     border-collapse: collapse;
     margin-top: 10px;
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
+    color: #fff;  /* better contrast if background is dark */
   }
 
+  /* Slightly darker background for the header for contrast */
   .table-fixed-rows thead tr {
     display: table;
     width: 100%;
     table-layout: fixed;
     position: sticky;
     top: 0;
-    background-color: rgba(255, 255, 255, 0.05);
+    background-color: rgba(255, 255, 255, 0.15);
     z-index: 5;
   }
 
@@ -182,7 +243,7 @@
 
   .table-fixed-rows tbody {
     display: block;
-    max-height: 8em; /* ~4 rows */
+    max-height: 35vh; /* ~4-5 rows visible depending on viewport */
     overflow-y: auto;
     scroll-behavior: smooth;
     width: 100%;
@@ -192,6 +253,35 @@
     display: table;
     width: 100%;
     table-layout: fixed;
+  }
+
+  /* 
+     3) Minimal "loading spinner" 
+  */
+  .spinner {
+    margin: 10px 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+  }
+  .spinner-dot {
+    width: 12px;
+    height: 12px;
+    margin: 0 4px;
+    border-radius: 50%;
+    background: #00aaff;
+    animation: pulse 1s infinite;
+  }
+  .spinner-dot:nth-child(2) {
+    animation-delay: 0.2s;
+  }
+  .spinner-dot:nth-child(3) {
+    animation-delay: 0.4s;
+  }
+  @keyframes pulse {
+    0% { transform: scale(1); opacity: 1; }
+    50% { transform: scale(1.5); opacity: 0.5; }
+    100% { transform: scale(1); opacity: 1; }
   }
 </style>
 
@@ -210,4 +300,12 @@
   }
 </style>
 {% endif %}
+
+<script>
+  // Show the spinner when user submits the form.
+  function showSpinner() {
+    document.getElementById('loadingSpinner').style.display = 'flex';
+  }
+</script>
+
 {% endblock %}
