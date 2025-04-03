@@ -1,8 +1,7 @@
 {% extends 'base.html' %}
-
 {% block content %}
 <section id="airport-section">
-  <div class="section-box">
+  <div class="section-box" data-aos="fade-up">
     <div class="content-wrap">
       <h2>List of Airports</h2>
 
@@ -19,11 +18,15 @@
             </option>
           {% endfor %}
         </select>
-        <button type="submit">Search</button>
+
+        <div style="margin-top: 10px;">
+          <button class="btn search-btn" type="submit" name="search">Search</button>
+          <button class="btn reset-btn" type="submit" name="reset" style="margin-left: 10px;">Reset</button>
+        </div>
       </form>
 
       {% if selected_airport_id %}
-        <div style="margin-top: 40px;">
+        <div style="margin-top: 40px;" data-aos="fade-up">
           <h3>Number of flights by aircraft type</h3>
           {% if flight_details and flight_details|length > 0 %}
             <table class="table-fixed-rows">
@@ -47,7 +50,7 @@
           {% endif %}
         </div>
 
-        <div style="margin-top: 40px;">
+        <div style="margin-top: 40px;" data-aos="fade-up">
           <h3>Number of flights per day of the week</h3>
           {% if flight_by_day and flight_by_day|length > 0 %}
             <table class="table-fixed-rows">
@@ -76,21 +79,23 @@
 </section>
 
 <style>
+
   html, body {
     margin: 0;
     padding: 0;
-    height: 100%;
-    overflow: hidden;
+    min-height: 100vh;
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   #airport-section {
     width: 100%;
-    height: 100%;
     box-sizing: border-box;
-
     display: flex;
     align-items: center; 
     justify-content: center;
+    padding: 2rem 1rem;
   }
 
   .section-box {
@@ -98,12 +103,10 @@
     padding: 30px;
     border-radius: 15px;
     max-width: 900px;
-    width: 95%;
+    width: 100%;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     text-align-last: center;
-    
-    max-height: 90%;
     overflow: auto;
   }
 
@@ -111,7 +114,7 @@
     padding: 20px 50px;
   }
 
-  select, input[type="text"] {
+  select {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
@@ -122,18 +125,30 @@
     font-weight: bold;
   }
 
-  button {
-    margin-top: 10px;
-    padding: 8px 16px;
+  .btn {
+    padding: 10px 16px;
     background-color: #00aaff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
-
-  button:hover {
+  .btn:hover {
     background-color: #0088cc;
+    transform: translateY(-2px);
+  }
+  .search-btn {
+    background-color: #00aaff;
+  }
+  .search-btn:hover {
+    background-color: #0088cc;
+  }
+  .reset-btn {
+    background-color: #cc0000;
+  }
+  .reset-btn:hover {
+    background-color: #aa0000;
   }
 
   .table-fixed-rows {
@@ -143,7 +158,6 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
   }
-
   .table-fixed-rows thead tr {
     display: table;
     width: 100%;
@@ -153,26 +167,59 @@
     background-color: rgba(255, 255, 255, 0.05);
     z-index: 5;
   }
-
   .table-fixed-rows thead th,
   .table-fixed-rows tbody td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-
   .table-fixed-rows tbody {
     display: block;
-    max-height: 8em; /* ~4 rows */
-    overflow-y: auto;
+    max-height: 8em; 
+    overflow-y: auto; 
     scroll-behavior: smooth;
     width: 100%;
   }
-
   .table-fixed-rows tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
+  }
+
+  @media (max-width: 480px) {
+    .section-box {
+      padding: 20px;
+    }
+    .content-wrap {
+      padding: 10px;
+    }
+  }
+
+  @media (max-width: 768px) {
+    .section-box {
+      max-width: 600px;
+    }
+    .content-wrap {
+      padding: 10px;
+    }
+    #airport-section {
+      padding: 1rem;
+    }
+  }
+
+  @media (max-width: 1440px) {
+    .section-box {
+      max-width: 1000px;
+    }
+  }
+
+  @media (min-width: 2560px) {
+    .section-box {
+      max-width: 2000px;
+    }
+    .content-wrap {
+      padding: 40px 80px;
+    }
   }
 </style>
 

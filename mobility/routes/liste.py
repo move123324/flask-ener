@@ -1,7 +1,9 @@
-from flask import (
-    Blueprint, render_template, request, flash
+from flask import Blueprint, render_template, request, flash, redirect, url_for
+from mobility.models.liste import (
+    get_airports,
+    get_flight_details,
+    get_flight_details_by_day
 )
-from mobility.models.liste import get_airports, get_flight_details, get_flight_details_by_day  
 
 bp = Blueprint('liste', __name__, url_prefix='/liste')
 
@@ -30,23 +32,39 @@ def afficher_liste_aeroports():
             - 'selected_airport_id' : L'ID de l'aéroport sélectionné dans le formulaire (si soumis)
     
     """
-    aeroport_list = get_airports()
-    selected_airport_id = None
+    aeroport_list = []
     flight_details = []
     flight_by_day = []
+    selected_airport_id = None
 
     ua_string = request.headers.get("User-Agent", "")
     windows = ("windows nt" in ua_string.lower() or "win64" in ua_string.lower())
 
-    # Vérifie si le formulaire a été soumis avec un aéroport sélectionné
-    if request.method == 'POST':
-        selected_airport_id = request.form.get('airport_id')
+    try:
+        aeroport_list = get_airports()
+    except Exception as e:
+        flash(f"Error retrieving airports: {e}", "error")
+        return render_template('liste.html',
+                               aeroport_list=[],
+                               flight_details=[],
+                               flight_by_day=[],
+                               selected_airport_id=None,
+                               windows=windows)
 
+    if request.method == 'POST':
+        if 'reset' in request.form:
+            return redirect(url_for('liste.afficher_liste_aeroports'))
+        selected_airport_id = request.form.get('airport_id')
         if not selected_airport_id:
-            flash("Veuillez sélectionner un aéroport.", 'error')
+            flash("Veuillez sélectionner un aéroport.", "error")
         else:
-            flight_details = get_flight_details(selected_airport_id)
-            flight_by_day = get_flight_details_by_day(selected_airport_id)
+            try:
+                flight_details = get_flight_details(selected_airport_id)
+                flight_by_day = get_flight_details_by_day(selected_airport_id)
+            except Exception as e:
+                flash(f"Database error: {e}", "error")
+                flight_details = []
+                flight_by_day = []
 
     return render_template(
         'liste.html',

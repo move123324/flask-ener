@@ -2,10 +2,115 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8">
+
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <title>My Mobility App</title>
+
+
+  <link rel="stylesheet" href="https://unpkg.com/aos@2.3.1/dist/aos.css" />
+  <script src="https://unpkg.com/aos@2.3.1/dist/aos.js"></script>
+
+  <style>
+    /****************************************
+     *  LOADING OVERLAY
+     ****************************************/
+    #loadingOverlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100vw;
+      height: 100vh;
+
+      background: url("/static/images/background.jpg") center / cover no-repeat;
+      z-index: 9999; 
+      display: block; 
+    }
+
+    #loadingLogo {
+      position: absolute;
+      top: 20px;
+      left: 20px;
+      width: 150px;
+      height: auto;
+    }
+    #loadingLogo img {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    #loadingSpinner {
+      position: absolute;
+      bottom: 20px;
+      right: 20px;
+      width: 40px;
+      height: 40px;
+      border: 4px solid #fff;
+      border-top: 4px solid transparent;
+      border-radius: 50%;
+      animation: spin 1s linear infinite;
+    }
+
+    @keyframes spin {
+      100% { transform: rotate(360deg); }
+    }
+
+    /****************************************
+     *  REMOVE FOCUS/CLICK LINES
+     ****************************************/
+    *:focus {
+      outline: none !important;
+    }
+    html, body, select, button {
+      -webkit-tap-highlight-color: transparent; 
+    }
+    button::-moz-focus-inner {
+      border: 0 !important;
+    }
+  </style>
+
+  <script>
+    function hideLoadingOverlayAfterRandomTime() {
+      const randomDuration = 3000 + Math.random() * 1000; 
+      setTimeout(() => {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) overlay.style.display = 'none';
+        sessionStorage.setItem('loaded', 'true');
+      }, randomDuration);
+    }
+
+    function initLoadingOverlay() {
+      const overlay = document.getElementById('loadingOverlay');
+      if (!sessionStorage.getItem('loaded')) {
+        overlay.style.display = 'block';
+        hideLoadingOverlayAfterRandomTime();
+      } else {
+        overlay.style.display = 'none';
+      }
+    }
+
+    function initAOS() {
+      AOS.init({
+        duration: 700,
+        once: true 
+      });
+    }
+
+    window.addEventListener('DOMContentLoaded', () => {
+      initLoadingOverlay();
+      initAOS();
+    });
+  </script>
 </head>
+
 <body style="margin: 0; padding: 0; font-family: sans-serif;">
+  <div id="loadingOverlay">
+    <div id="loadingLogo">
+      <img src="/static/images/Aerobel.png" alt="Aerobel Logo" />
+    </div>
+    <div id="loadingSpinner"></div>
+  </div>
+
   {% with messages = get_flashed_messages(with_categories=true) %}
     {% if messages %}
       <ul>
@@ -17,6 +122,7 @@
       </ul>
     {% endif %}
   {% endwith %}
+
   {% block content %}{% endblock %}
 </body>
 </html>
