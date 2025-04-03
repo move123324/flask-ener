@@ -20,10 +20,9 @@
       left: 0;
       width: 100vw;
       height: 100vh;
-
+      display: block; 
       background: url("/static/images/background.jpg") center / cover no-repeat;
       z-index: 9999; 
-      display: block; 
     }
 
     #loadingLogo {
@@ -50,7 +49,6 @@
       border-radius: 50%;
       animation: spin 1s linear infinite;
     }
-
     @keyframes spin {
       100% { transform: rotate(360deg); }
     }
@@ -62,7 +60,7 @@
       outline: none !important;
     }
     html, body, select, button {
-      -webkit-tap-highlight-color: transparent; 
+      -webkit-tap-highlight-color: transparent;
     }
     button::-moz-focus-inner {
       border: 0 !important;
@@ -70,28 +68,35 @@
   </style>
 
   <script>
+
     function hideLoadingOverlayAfterRandomTime() {
       const randomDuration = 3000 + Math.random() * 1000; 
       setTimeout(() => {
         const overlay = document.getElementById('loadingOverlay');
-        if (overlay) overlay.style.display = 'none';
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
         sessionStorage.setItem('loaded', 'true');
       }, randomDuration);
     }
 
     function initLoadingOverlay() {
-      const overlay = document.getElementById('loadingOverlay');
-      if (!sessionStorage.getItem('loaded')) {
-        overlay.style.display = 'block';
-        hideLoadingOverlayAfterRandomTime();
+
+      if (sessionStorage.getItem('loaded')) {
+        const overlay = document.getElementById('loadingOverlay');
+        if (overlay) {
+          overlay.style.display = 'none';
+        }
       } else {
-        overlay.style.display = 'none';
+
+        hideLoadingOverlayAfterRandomTime();
       }
     }
 
+
     function initAOS() {
       AOS.init({
-        duration: 700,
+        duration: 700, 
         once: true 
       });
     }
