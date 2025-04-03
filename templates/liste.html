@@ -1,15 +1,13 @@
 {% extends 'base.html' %}
 {% block content %}
 <section id="airport-section">
-  <div class="section-box">
+  <div class="section-box" data-aos="fade-up">
     <div class="content-wrap">
       <h2>List of Airports</h2>
-      
-      <!-- Airport selection form -->
+
       <form method="POST" action="/liste">
         <label for="airport">Select your airport:</label>
         <select name="airport_id" id="airport">
-          <!-- Provide an empty option first -->
           <option value="">-- Choose an airport --</option>
           {% for airport in aeroport_list %}
             <option 
@@ -21,91 +19,82 @@
           {% endfor %}
         </select>
 
-        <!-- Two buttons: Search & Reset -->
-        <button type="submit" name="search">Search</button>
-        <button type="submit" name="reset">Reset</button>
+        <div style="margin-top: 10px;">
+          <button class="btn search-btn" type="submit" name="search">Search</button>
+          <button class="btn reset-btn" type="submit" name="reset" style="margin-left: 10px;">Reset</button>
+        </div>
       </form>
-      
-      <!-- Only show tables if user selected an airport -->
-      {% if selected_airport_id %}
-        <div class="tables-container">
-          
-          <!-- Table: Number of flights by aircraft type -->
-          <div style="margin-top: 40px;">
-            <h3>Number of flights by aircraft type</h3>
-            {% if flight_details and flight_details|length > 0 %}
-              <table class="table-fixed-rows">
-                <thead>
-                  <tr>
-                    <th>Aircraft type</th>
-                    <th>Number of flights</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for flight in flight_details %}
-                    <tr>
-                      <td>{{ flight['aircraft_type'] }}</td>
-                      <td>{{ flight['total_vols'] }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p>No flights found for this type of aircraft.</p>
-            {% endif %}
-          </div>
-          
-          <!-- Table: Number of flights per day of the week -->
-          <div style="margin-top: 40px;">
-            <h3>Number of flights per day of the week</h3>
-            {% if flight_by_day and flight_by_day|length > 0 %}
-              <table class="table-fixed-rows">
-                <thead>
-                  <tr>
-                    <th>Day of the week</th>
-                    <th>Number of flights</th>
-                  </tr>
-                </thead>
-                <tbody>
-                  {% for flight in flight_by_day %}
-                    <tr>
-                      <td>{{ flight['day_of_week'] }}</td>
-                      <td>{{ flight['total_vols'] }}</td>
-                    </tr>
-                  {% endfor %}
-                </tbody>
-              </table>
-            {% else %}
-              <p>No flights found for this airport.</p>
-            {% endif %}
-          </div>
 
-        </div> <!-- .tables-container -->
+      {% if selected_airport_id %}
+        <div style="margin-top: 40px;" data-aos="fade-up">
+          <h3>Number of flights by aircraft type</h3>
+          {% if flight_details and flight_details|length > 0 %}
+            <table class="table-fixed-rows">
+              <thead>
+                <tr>
+                  <th>Aircraft type</th>
+                  <th>Number of flights</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for flight in flight_details %}
+                  <tr>
+                    <td>{{ flight['aircraft_type'] }}</td>
+                    <td>{{ flight['total_vols'] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>No flights found for this type of aircraft.</p>
+          {% endif %}
+        </div>
+
+        <div style="margin-top: 40px;" data-aos="fade-up">
+          <h3>Number of flights per day of the week</h3>
+          {% if flight_by_day and flight_by_day|length > 0 %}
+            <table class="table-fixed-rows">
+              <thead>
+                <tr>
+                  <th>Day of the week</th>
+                  <th>Number of flights</th>
+                </tr>
+              </thead>
+              <tbody>
+                {% for flight in flight_by_day %}
+                  <tr>
+                    <td>{{ flight['day_of_week'] }}</td>
+                    <td>{{ flight['total_vols'] }}</td>
+                  </tr>
+                {% endfor %}
+              </tbody>
+            </table>
+          {% else %}
+            <p>No flights found for this airport.</p>
+          {% endif %}
+        </div>
       {% endif %}
-    </div> <!-- .content-wrap -->
-  </div> <!-- .section-box -->
+    </div>
+  </div>
 </section>
 
 <style>
-  /* 
-    100% responsive layout
-    We'll allow normal page scrolling 
-    so no content is clipped on smaller screens.
-  */
+
   html, body {
     margin: 0;
     padding: 0;
-    width: 100%;
     min-height: 100vh;
-    font-family: sans-serif;
-    /* We allow vertical scrolling so all content is accessible. */
-    overflow-x: hidden; /* no horizontal scroll bar if content is wide. */
+    width: 100%;
+    overflow-x: hidden;
+    overflow-y: auto;
   }
 
   #airport-section {
     width: 100%;
     box-sizing: border-box;
-    /* Flexible top/bottom spacing (for large or small screens) */
+    display: flex;
+    align-items: center; 
+    justify-content: center;
     padding: 2rem 1rem;
   }
 
@@ -114,18 +103,18 @@
     padding: 30px;
     border-radius: 15px;
     max-width: 900px;
-    margin: 0 auto; /* center horizontally */
+    width: 100%;
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     text-align: center;
     text-align-last: center;
-    width: 100%;
+    overflow: auto;
   }
 
   .content-wrap {
-    padding: 20px;
+    padding: 20px 50px;
   }
 
-  select, input[type="text"] {
+  select {
     width: 100%;
     padding: 10px;
     margin-top: 10px;
@@ -136,22 +125,30 @@
     font-weight: bold;
   }
 
-  button {
-    margin-top: 10px;
+  .btn {
     padding: 10px 16px;
     background-color: #00aaff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    transition: background-color 0.3s ease, transform 0.2s ease;
   }
-
-  button:hover {
+  .btn:hover {
+    background-color: #0088cc;
+    transform: translateY(-2px);
+  }
+  .search-btn {
+    background-color: #00aaff;
+  }
+  .search-btn:hover {
     background-color: #0088cc;
   }
-
-  .tables-container {
-    margin-top: 1.5rem;
+  .reset-btn {
+    background-color: #cc0000;
+  }
+  .reset-btn:hover {
+    background-color: #aa0000;
   }
 
   .table-fixed-rows {
@@ -161,65 +158,67 @@
     border: 1px solid rgba(255, 255, 255, 0.1);
     border-radius: 10px;
   }
-
   .table-fixed-rows thead tr {
     display: table;
     width: 100%;
     table-layout: fixed;
     position: sticky;
     top: 0;
-    background-color: rgba(255, 255, 255, 0.1);
+    background-color: rgba(255, 255, 255, 0.05);
     z-index: 5;
   }
-
   .table-fixed-rows thead th,
   .table-fixed-rows tbody td {
     padding: 10px;
     text-align: left;
     border-bottom: 1px solid rgba(255, 255, 255, 0.1);
   }
-
   .table-fixed-rows tbody {
     display: block;
-    max-height: 8em; /* ~4 rows before scroll */
-    overflow-y: auto;
+    max-height: 8em; 
+    overflow-y: auto; 
     scroll-behavior: smooth;
     width: 100%;
   }
-
   .table-fixed-rows tbody tr {
     display: table;
     width: 100%;
     table-layout: fixed;
   }
 
-  /* 
-    Media queries for smaller screens:
-    Reduce padding & font sizes so it fits better
-  */
-  @media (max-width: 768px) {
+  @media (max-width: 480px) {
     .section-box {
       padding: 20px;
     }
     .content-wrap {
       padding: 10px;
     }
-    button {
-      width: 48%;
-      margin: 10px 1%;
+  }
+
+  @media (max-width: 768px) {
+    .section-box {
+      max-width: 600px;
     }
-    select {
-      font-size: 0.9rem;
+    .content-wrap {
+      padding: 10px;
+    }
+    #airport-section {
+      padding: 1rem;
     }
   }
 
-  @media (max-width: 480px) {
-    h2, h3 {
-      font-size: 1.2rem;
+  @media (max-width: 1440px) {
+    .section-box {
+      max-width: 1000px;
     }
-    button {
-      width: 100%;
-      margin: 10px 0;
+  }
+
+  @media (min-width: 2560px) {
+    .section-box {
+      max-width: 2000px;
+    }
+    .content-wrap {
+      padding: 40px 80px;
     }
   }
 </style>
