@@ -5,11 +5,11 @@
     <div class="content-wrap">
       <h2>List of Airports</h2>
       
-      <!-- Airport selection form -->
-      <form method="POST" action="/liste">
+
+      <form method="POST" action="/liste" class="airport-form">
         <label for="airport">Select your airport:</label>
         <select name="airport_id" id="airport">
-          <!-- Provide an empty option first -->
+
           <option value="">-- Choose an airport --</option>
           {% for airport in aeroport_list %}
             <option 
@@ -21,16 +21,17 @@
           {% endfor %}
         </select>
 
-        <!-- Two buttons: Search & Reset -->
-        <button type="submit" name="search">Search</button>
-        <button type="submit" name="reset">Reset</button>
+
+        <div class="buttons-row">
+          <button class="btn search-button" type="submit" name="search">Search</button>
+          <button class="btn reset-button" type="submit" name="reset">Reset</button>
+        </div>
       </form>
       
-      <!-- Only show tables if user selected an airport -->
+
       {% if selected_airport_id %}
         <div class="tables-container">
           
-          <!-- Table: Number of flights by aircraft type -->
           <div style="margin-top: 40px;">
             <h3>Number of flights by aircraft type</h3>
             {% if flight_details and flight_details|length > 0 %}
@@ -55,7 +56,7 @@
             {% endif %}
           </div>
           
-          <!-- Table: Number of flights per day of the week -->
+
           <div style="margin-top: 40px;">
             <h3>Number of flights per day of the week</h3>
             {% if flight_by_day and flight_by_day|length > 0 %}
@@ -80,32 +81,26 @@
             {% endif %}
           </div>
 
-        </div> <!-- .tables-container -->
+        </div> 
       {% endif %}
-    </div> <!-- .content-wrap -->
-  </div> <!-- .section-box -->
+    </div> 
+  </div> 
 </section>
 
 <style>
-  /* 
-    100% responsive layout
-    We'll allow normal page scrolling 
-    so no content is clipped on smaller screens.
-  */
+  /* --- Base Page Styles --- */
   html, body {
     margin: 0;
     padding: 0;
     width: 100%;
     min-height: 100vh;
     font-family: sans-serif;
-    /* We allow vertical scrolling so all content is accessible. */
-    overflow-x: hidden; /* no horizontal scroll bar if content is wide. */
+    overflow-x: hidden;
   }
 
   #airport-section {
     width: 100%;
     box-sizing: border-box;
-    /* Flexible top/bottom spacing (for large or small screens) */
     padding: 2rem 1rem;
   }
 
@@ -113,7 +108,7 @@
     background-color: rgba(255, 255, 255, 0.05);
     padding: 30px;
     border-radius: 15px;
-    max-width: 900px;
+    max-width: 1200px; 
     margin: 0 auto; /* center horizontally */
     box-shadow: 0 0 15px rgba(0, 0, 0, 0.3);
     text-align: center;
@@ -123,6 +118,11 @@
 
   .content-wrap {
     padding: 20px;
+  }
+
+  .airport-form {
+    max-width: 600px; 
+    margin: 0 auto;
   }
 
   select, input[type="text"] {
@@ -136,17 +136,25 @@
     font-weight: bold;
   }
 
-  button {
+  .buttons-row {
+    display: flex;
+    justify-content: space-between;
+    gap: 1rem;
     margin-top: 10px;
+  }
+
+  .btn {
     padding: 10px 16px;
     background-color: #00aaff;
     color: white;
     border: none;
     border-radius: 5px;
     cursor: pointer;
+    flex: 1;
+    text-align: center;
   }
 
-  button:hover {
+  .btn:hover {
     background-color: #0088cc;
   }
 
@@ -193,36 +201,50 @@
     table-layout: fixed;
   }
 
-  /* 
-    Media queries for smaller screens:
-    Reduce padding & font sizes so it fits better
-  */
-  @media (max-width: 768px) {
+
+  /* --- MEDIA QUERIES --- */
+
+  @media (max-width: 992px) {
     .section-box {
-      padding: 20px;
+      max-width: 700px; 
     }
     .content-wrap {
       padding: 10px;
     }
-    button {
-      width: 48%;
-      margin: 10px 1%;
-    }
-    select {
-      font-size: 0.9rem;
-    }
   }
 
   @media (max-width: 480px) {
-    h2, h3 {
-      font-size: 1.2rem;
+    .buttons-row {
+      flex-direction: column;
     }
-    button {
+    .btn {
       width: 100%;
-      margin: 10px 0;
+      margin-bottom: 10px;
+    }
+    .btn:last-child {
+      margin-bottom: 0;
+    }
+  }
+
+  @media (min-width: 1201px) and (max-width: 1920px) {
+    .section-box {
+      max-width: 1400px;
+    }
+  }
+
+  @media (min-width: 1921px) and (max-width: 2560px) {
+    .section-box {
+      max-width: 1800px;
+    }
+  }
+
+  @media (min-width: 2561px) {
+    .section-box {
+      max-width: 2200px;
     }
   }
 </style>
+
 
 {% if windows %}
 <style>
